@@ -8,9 +8,6 @@ def stump(heights):
     x = unit / 2
     y = unit * (3 ** 0.5 / 2) / 2
 
-    # x = round(x, 3)
-    # x = round(x, 3)
-
     tri = polyhedron(
         points = [
             # bottom
@@ -56,6 +53,11 @@ def stump(heights):
             (2, 5, 3, 0)
         ]
     )
+
+    # offset floating point errors
+    unit = 0.999999
+    x = unit / 2
+    y = unit * (3 ** 0.5 / 2) / 2
 
     return union()(
         scale([1, 1, heights[0]])(
