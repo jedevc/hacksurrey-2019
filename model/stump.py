@@ -8,6 +8,9 @@ def stump(heights):
     x = unit / 2
     y = unit * (3 ** 0.5 / 2) / 2
 
+    # x = round(x, 3)
+    # x = round(x, 3)
+
     tri = polyhedron(
         points = [
             # bottom
@@ -21,26 +24,46 @@ def stump(heights):
         ],
         faces = [
             # bottom
-            (0, 1, 2),
+            (2, 1, 0),
             # top
             (3, 4, 5),
             # sides
-            (0, 1, 4, 3),
-            (1, 2, 5, 4),
-            (2, 0, 3, 5)
+            (1, 4, 3, 0),
+            (2, 5, 4, 1),
+            (0, 3, 5, 2)
+        ]
+    )
+
+    rtri = polyhedron(
+        points = [
+            # bottom
+            (-x, -y, 0),
+            (x, -y, 0),
+            (0, y, 0),
+            # top
+            (-x, -y, 1),
+            (x, -y, 1),
+            (0, y, 1)
+        ],
+        faces = [
+            # bottom
+            (0, 1, 2),
+            # top
+            (5, 4, 3),
+            # sides
+            (0, 3, 4, 1),
+            (1, 4, 5, 2),
+            (2, 5, 3, 0)
         ]
     )
 
     return union()(
-        tri,
         scale([1, 1, heights[0]])(
             tri
         ),
         scale([1, 1, heights[1]])(
             translate([0, 2 * y, 0])(
-                rotate([0, 0, 180])(
-                    tri
-                )
+                rtri
             )
         ),
         scale([1, 1, heights[2]])(
@@ -50,9 +73,7 @@ def stump(heights):
         ),
         scale([1, 1, heights[3]])(
             translate([2 * x, 2 * y, 0])(
-                rotate([0, 0, 180])(
-                    tri
-                )
+                rtri
             )
         ),
         scale([1, 1, heights[4]])(
@@ -62,9 +83,7 @@ def stump(heights):
         ),
         scale([1, 1, heights[5]])(
             translate([x, 0, 0])(
-                rotate([0, 0, 180])(
-                    tri
-                )
+                rtri
             )
         )
     )
