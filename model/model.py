@@ -12,4 +12,3 @@ def main():
 
     scad = scad_render(st)
     print(scad)
-
