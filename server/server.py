@@ -25,7 +25,7 @@ def create():
             data = datafile.read()
 
     if not data:
-        return 'invalid request', 400
+        return 'file field not provided', 400
 
     h = hashlib.sha256()
     h.update(data)
