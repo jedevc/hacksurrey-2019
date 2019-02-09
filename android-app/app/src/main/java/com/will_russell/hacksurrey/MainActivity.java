@@ -36,20 +36,26 @@ public class MainActivity extends AppCompatActivity {
 
     static final int GET_FROM_STORAGE = 1;
     ArrayList<Uri> files = new ArrayList<>();
+
+    KSIServiceCredentials credentials;
+    HttpClientSettings clientSettings;
+    SimpleHttpClient simpleHttpClient;
+    DataHasher hasher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        KSIServiceCredentials credentials = new KSIServiceCredentials("ot.9HL3ao", "F8ByaJsVcq0c");
+        credentials = new KSIServiceCredentials("ot.9HL3ao", "F8ByaJsVcq0c");
 
-        HttpClientSettings clientSettings = new HttpClientSettings(
+        clientSettings = new HttpClientSettings(
                 "http://tryout.guardtime.net:8080/gt-signingservice",
                 "https://tryout-extender.guardtime.net:8081/gt-extendingservice",
                 "http://verify.guardtime.com/ksi-publications.bin",
                 credentials);
 
-        SimpleHttpClient simpleHttpClient = new SimpleHttpClient(clientSettings);
+        simpleHttpClient = new SimpleHttpClient(clientSettings);
         try {
             KSI ksi = new KSIBuilder()
                     .setKsiProtocolSignerClient(simpleHttpClient)
@@ -58,23 +64,10 @@ public class MainActivity extends AppCompatActivity {
                     .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
                     .build();
         } catch(Exception e) {
-            
+
         }
 
-        DataHasher hasher = new DataHasher();
-
-        // Read the input file to be signed
-        FileInputStream inputStream;
-        byte[] fileContent;
-        try {
-            inputStream = new FileInputStream("signme.txt"); // CHANGE TO ANDROID INPUT
-            fileContent = Files.readAllBytes(Paths.get("signme.txt")); // CHANGE TO ANDROID
-            System.out.printf("\n\nInput file: %s\n", new String(fileContent));
-            hasher.addData(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        hasher = new DataHasher();
     }
 
     public void uploadButtonOnClick(View v) {
@@ -104,6 +97,28 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == GET_FROM_STORAGE && resultCode == Activity.RESULT_OK) {
             Uri fileUri = data.getData();
             files.add(fileUri);
+
+            // Read the input file to be signed
+            byte[] fileContent;
+            try {
+
+                InputStream stream = getContentResolver().openInputStream(fileUri);
+                fileContent = getBytes(stream);
+                System.out.printf("\n\nInput file: %s\n", new String(fileContent));
+                hasher.addData(stream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length = 0;
+        while ((length = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, length);
+        }
+        return byteBuffer.toByteArray();
     }
 }
