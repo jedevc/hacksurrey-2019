@@ -1,15 +1,25 @@
 import math
 
-def permute(li, number):
-    li = li[:]
+def permute(ordered, number):
+    li = ordered[:]
     final = []
     
     seq = to_factoradic(number, len(li))
-    print(seq)
     for i in seq:
         final.append(li.pop(i))
 
     return final
+
+def depermute(permuted, ordered):
+    li = ordered[:]
+    seq = []
+
+    for i in permuted:
+        index = li.index(i)
+        seq.append(index)
+        li.pop(index)
+
+    return from_factoradic(seq)
 
 def to_factoradic(number, places):
     data = []
