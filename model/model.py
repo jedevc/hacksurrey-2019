@@ -8,13 +8,16 @@ from . import permute
 
 def main():
     stuff = bytes(random.randint(0, 255) for i in range(32))
-    stuff = int.from_bytes(stuff, 'big')
-    hexes = to_base(stuff, 720)
+    m = create_model(stuff, 3, 9)
+    print(scad_render(m))
 
-    assert len(hexes) == 27
+def create_model(data, rows, columns):
+    hexes = to_base(int.from_bytes(data, 'big'), 720)
+    assert len(hexes) == rows * columns
 
-    for row in range(3):
-        for col in range(9):
+    sts = []
+    for row in range(rows):
+        for col in range(columns):
             order = permute.permute([1, 2, 3, 4, 5, 6], hexes[row * 9 + col])
 
             heights = [0.5 + 1.5 * i / len(order) for i in order]
@@ -26,8 +29,9 @@ def main():
             ydiff *= 1.1
             st = translate([xdiff, ydiff, 0])(st)
 
-            scad = scad_render(st)
-            print(scad)
+            sts.append(st)
+
+    return union()(sts)
 
 def to_base(number, base):
     top = 1
