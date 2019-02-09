@@ -31,15 +31,16 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("Permission denied");
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                System.out.println("Rip");
             } else {
                 // No explanation needed; request the permission
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GET_FROM_STORAGE);
             }
         } else {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            System.out.println("Success");
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
             startActivityForResult(intent, GET_FROM_STORAGE);
         }
     }
@@ -50,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == GET_FROM_STORAGE && resultCode == Activity.RESULT_OK) {
             Uri fileUri = data.getData();
-            System.out.println("Wow!");
         }
     }
 }
