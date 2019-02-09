@@ -11,13 +11,23 @@ def main():
     stuff = int.from_bytes(stuff, 'big')
     hexes = to_base(stuff, 720)
 
-    order = permute.permute([1, 2, 3, 4, 5, 6], hexes[0])
+    assert len(hexes) == 27
 
-    heights = [0.5 + 1.5 * i / len(order) for i in order]
-    st = stump(heights)
+    for row in range(3):
+        for col in range(9):
+            order = permute.permute([1, 2, 3, 4, 5, 6], hexes[row * 9 + col])
 
-    scad = scad_render(st)
-    print(scad)
+            heights = [0.5 + 1.5 * i / len(order) for i in order]
+            st = stump(heights)
+
+            xdiff = 1.5 * col
+            xdiff *= 1.1
+            ydiff = (-3 ** 0.5) * row - (3 ** 0.5 / 2) * col
+            ydiff *= 1.1
+            st = translate([xdiff, ydiff, 0])(st)
+
+            scad = scad_render(st)
+            print(scad)
 
 def to_base(number, base):
     top = 1
