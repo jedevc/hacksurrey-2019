@@ -1,9 +1,22 @@
 import math
 
+def permute(li, number):
+    li = li[:]
+    final = []
+    
+    seq = to_factoradic(number, len(li))
+    print(seq)
+    for i in seq:
+        final.append(li.pop(i))
+
+    return final
+
 def to_factoradic(number, places):
     data = []
 
-    for i in range(places, -1, -1):
+    assert number < math.factorial(places)
+
+    for i in range(places - 1, -1, -1):
         result = number // math.factorial(i)
         data.append(result)
         if result > 0:

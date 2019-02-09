@@ -4,6 +4,8 @@ from .stump import stump
 
 import random
 
+from . import permute
+
 def main():
     order = [1, 2, 3, 4, 5, 6]
     random.shuffle(order)
