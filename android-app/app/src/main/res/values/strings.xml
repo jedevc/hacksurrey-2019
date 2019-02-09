@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HackSurrey</string>
+    <string name="upload_button_text">Upload file</string>
 </resources>
