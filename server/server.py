@@ -28,6 +28,10 @@ def create():
 
     return hid
 
+@app.route('/file/<hid>')
+def get_file(hid):
+    return 'this is a file! ' + hid
+
 @app.errorhandler(404)
 def not_found(error):
     return 'endpoint not found', 404
