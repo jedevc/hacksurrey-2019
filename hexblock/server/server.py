@@ -3,6 +3,7 @@ from flask import Flask, request
 
 import os
 from os import path
+import subprocess
 import hashlib
 import re
 
@@ -57,25 +58,14 @@ def get_model(hid):
     if re.search('[^0-9a-f]', hid):
         return 'invalid hash provided'
 
-    model_filename = path.join(MODELS, hid)
-    try:
-        with open(model_filename, 'rb') as mf:
-            return mf.read()
-    except FileNotFoundError:
-        pass
+    return get_model(hid)
 
-    try:
-        upload_filename = path.join(UPLOADS, hid)
+@app.route('/render/<hid>')
+def get_render(hid):
+    if re.search('[^0-9a-f]', hid):
+        return 'invalid hash provided'
 
-        if path.exists(upload_filename):
-            mod = model.create_model(bytes.fromhex(hid), 3, 9)
-            mod = model.render_model(mod).encode('utf8')
-            model_filename = path.join(MODELS, hid)
-            with open(model_filename, 'wb') as mf:
-                mf.write(mod)
-            return mod
-    except FileNotFoundError:
-        pass
+    return get_render(hid)
 
 @app.errorhandler(404)
 def not_found(error):
@@ -86,3 +76,33 @@ def main():
     os.makedirs(MODELS, exist_ok=True)
 
     app.run()
+
+def get_model(hid):
+    model_filename = path.join(MODELS, hid)
+    if path.exists(model_filename):
+        with open(model_filename, 'rb') as mf:
+            return mf.read()
+    else:
+        upload_filename = path.join(UPLOADS, hid)
+
+        if path.exists(upload_filename):
+            mod = model.create_model(bytes.fromhex(hid), 3, 9)
+            mod = model.render_model(mod).encode('utf8')
+            model_filename = path.join(MODELS, hid)
+            with open(model_filename, 'wb') as mf:
+                mf.write(mod)
+            return mod
+
+    return None
+
+def get_render(hid):
+    if not get_model(hid):
+        return None
+
+    render_filename = path.join(MODELS, hid + '.stl')
+    if not path.exists(render_filename):
+        model_filename = path.join(MODELS, hid)
+        subprocess.run(['openscad', model_filename, '-o', render_filename])
+
+    with open(render_filename, 'rb') as mf:
+        return mf.read()
