@@ -3,6 +3,7 @@ package com.will_russell.hacksurrey;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.icu.util.Output;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +25,10 @@ import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
@@ -31,6 +36,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     static final int GET_FROM_STORAGE = 1;
+    static final String SERVER_URL = "";
     ArrayList<Uri> files = new ArrayList<>();
 
     KSIServiceCredentials credentials;
@@ -43,11 +49,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        /*
         try {
             setupGuardtime();
         } catch (KSIException e) {
             e.printStackTrace();
         }
+        */
     }
 
     public void setupGuardtime() throws KSIException {
@@ -71,9 +79,34 @@ public class MainActivity extends AppCompatActivity {
                     .setPublicationsFilePkiTrustStore(ks)
                     .build();
             System.out.println("Hash algorithm: " + HashAlgorithm.SHA2_256);
-            DataHasher hasher = new DataHasher();
+            DataHasher hasher = new DataHasher(HashAlgorithm.SHA2_256);
         } catch (KeyStoreException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void makeRequest(byte[] data) {
+        HttpURLConnection client = null;
+        try {
+            URL url = new URL(SERVER_URL);
+            client = (HttpURLConnection) url.openConnection();
+            client.setRequestMethod("POST");
+            client.setRequestProperty("Key", "Value");
+            client.setDoOutput(true);
+            OutputStream outputStream  = client.getOutputStream());
+            outputStream.write(data);
+            outputStream.flush();
+            outputStream.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (SocketTimeoutException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (client != null) {
+                client.disconnect();
+            }
         }
     }
 
@@ -111,8 +144,9 @@ public class MainActivity extends AppCompatActivity {
 
                 InputStream stream = getContentResolver().openInputStream(fileUri);
                 fileContent = getBytes(stream);
+                makeRequest();
                 //System.out.printf("\n\nInput file: %s\n", new String(fileContent));
-                hasher.addData(stream);
+                //hasher.addData(stream);
             } catch (IOException e) {
                 e.printStackTrace();
             }
