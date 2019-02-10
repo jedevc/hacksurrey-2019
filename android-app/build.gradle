@@ -16,6 +16,9 @@ allprojects {
         google()
         jcenter()
         maven {
+            url "https://github.com/bcgit/bc-java"
+        }
+        maven {
             url "https://github.com/guardtime/ksi-java-sdk"
         }
     }
