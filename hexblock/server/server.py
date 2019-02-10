@@ -13,6 +13,8 @@ from ..model import model
 
 app = Flask(__name__)
 
+PREVIEW_MODE = True
+
 UPLOADS = path.abspath('./uploads')
 MODELS = path.abspath('./models')
 
@@ -101,6 +103,7 @@ def get_render(hid):
     if not path.exists(render_filename):
         subprocess.run(['openscad', model_filename, '-o', render_filename])
 
+    if PREVIEW_MODE:
         print(['openscad', model_filename])
         func = lambda: subprocess.run(['openscad', model_filename])
         thread = Thread(target=func)
