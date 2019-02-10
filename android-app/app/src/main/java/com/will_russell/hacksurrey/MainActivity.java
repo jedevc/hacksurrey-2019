@@ -16,20 +16,16 @@ import androidx.core.content.ContextCompat;
 import com.guardtime.ksi.KSI;
 import com.guardtime.ksi.KSIBuilder;
 import com.guardtime.ksi.exceptions.KSIException;
-import com.guardtime.ksi.hashing.DataHash;
 import com.guardtime.ksi.hashing.DataHasher;
+import com.guardtime.ksi.hashing.HashAlgorithm;
 import com.guardtime.ksi.service.client.KSIServiceCredentials;
 import com.guardtime.ksi.service.client.http.HttpClientSettings;
 import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
 import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
-import com.guardtime.ksi.unisignature.KSISignature;
-import com.guardtime.ksi.unisignature.verifier.policies.KeyBasedVerificationPolicy;
-import com.guardtime.ksi.unisignature.verifier.policies.Policy;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Date;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,13 +36,21 @@ public class MainActivity extends AppCompatActivity {
     KSIServiceCredentials credentials;
     HttpClientSettings clientSettings;
     SimpleHttpClient simpleHttpClient;
+    KSI ksi;
     DataHasher hasher;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        try {
+            setupGuardtime();
+        } catch (KSIException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void setupGuardtime() throws KSIException {
         credentials = new KSIServiceCredentials("ot.9HL3ao", "F8ByaJsVcq0c");
 
         clientSettings = new HttpClientSettings(
@@ -56,18 +60,21 @@ public class MainActivity extends AppCompatActivity {
                 credentials);
 
         simpleHttpClient = new SimpleHttpClient(clientSettings);
+        KeyStore ks;
         try {
-            KSI ksi = new KSIBuilder()
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ksi = new KSIBuilder()
                     .setKsiProtocolSignerClient(simpleHttpClient)
                     .setKsiProtocolExtenderClient(simpleHttpClient)
                     .setKsiProtocolPublicationsFileClient(simpleHttpClient)
                     .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
+                    .setPublicationsFilePkiTrustStore(ks)
                     .build();
-        } catch(Exception e) {
-
+            System.out.println("Hash algorithm: " + HashAlgorithm.SHA2_256);
+            DataHasher hasher = new DataHasher();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
         }
-
-        hasher = new DataHasher();
     }
 
     public void uploadButtonOnClick(View v) {
@@ -104,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
                 InputStream stream = getContentResolver().openInputStream(fileUri);
                 fileContent = getBytes(stream);
-                System.out.printf("\n\nInput file: %s\n", new String(fileContent));
+                //System.out.printf("\n\nInput file: %s\n", new String(fileContent));
                 hasher.addData(stream);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -112,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public byte[] getBytes(InputStream inputStream) throws IOException {
+    private byte[] getBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int length = 0;
