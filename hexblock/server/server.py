@@ -11,8 +11,8 @@ from ..model import model
 
 app = Flask(__name__)
 
-UPLOADS = './uploads'
-MODELS = './models'
+UPLOADS = path.abspath('./uploads')
+MODELS = path.abspath('./models')
 
 @app.route('/create', methods=['POST'])
 def create():
@@ -54,14 +54,14 @@ def get_model(hid):
     if re.search('[^0-9a-f]', hid):
         return 'invalid hash provided'
 
-    return get_model(hid)
+    return flask.send_file(get_model(hid))
 
 @app.route('/render/<hid>')
 def get_render(hid):
     if re.search('[^0-9a-f]', hid):
         return 'invalid hash provided'
 
-    return get_render(hid)
+    return flask.send_file(get_render(hid))
 
 @app.errorhandler(404)
 def not_found(error):
@@ -76,8 +76,7 @@ def main():
 def get_model(hid):
     model_filename = path.join(MODELS, hid)
     if path.exists(model_filename):
-        with open(model_filename, 'rb') as mf:
-            return mf.read()
+        return model_filename
     else:
         upload_filename = path.join(UPLOADS, hid)
 
@@ -87,7 +86,7 @@ def get_model(hid):
             model_filename = path.join(MODELS, hid)
             with open(model_filename, 'wb') as mf:
                 mf.write(mod)
-            return mod
+            return model_filename
 
     return None
 
@@ -100,5 +99,4 @@ def get_render(hid):
         model_filename = path.join(MODELS, hid)
         subprocess.run(['openscad', model_filename, '-o', render_filename])
 
-    with open(render_filename, 'rb') as mf:
-        return mf.read()
+    return render_filename
