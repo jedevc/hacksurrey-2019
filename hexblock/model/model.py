@@ -1,4 +1,4 @@
-from solid import *
+import solid
 
 from .stump import stump
 
@@ -9,7 +9,16 @@ from . import permute
 def main():
     stuff = bytes(random.randint(0, 255) for i in range(32))
     m = create_model(stuff, 3, 9)
-    print(render_model(m))
+    base = solid.translate([-3, -3, 0])(
+        solid.rotate([0, 0, -30])(
+            solid.scale([20, 6, 0.5])(
+                solid.cube(1)
+            )
+        )
+    )
+
+    final = solid.union()(base, m)
+    print(render_model(final))
 
 def create_model(data, rows, columns):
     hexes = to_base(int.from_bytes(data, 'big'), 720)
@@ -27,14 +36,14 @@ def create_model(data, rows, columns):
             xdiff *= 1.1
             ydiff = (-3 ** 0.5) * row - (3 ** 0.5 / 2) * col
             ydiff *= 1.1
-            st = translate([xdiff, ydiff, 0])(st)
+            st = solid.translate([xdiff, ydiff, 0])(st)
 
             sts.append(st)
 
-    return union()(sts)
+    return solid.union()(sts)
 
 def render_model(model):
-    return scad_render(model)
+    return solid.scad_render(model)
 
 def to_base(number, base):
     top = 1
