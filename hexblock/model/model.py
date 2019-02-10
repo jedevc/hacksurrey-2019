@@ -3,15 +3,17 @@ import solid
 from .stump import stump
 
 import random
+import hashlib
 
 from . import permute
 
 def main():
-    stuff = bytes(random.randint(0, 255) for i in range(32))
+    stuff = hashlib.sha256(b'data').digest()
+
     m = create_model(stuff, 3, 9)
     base = solid.translate([-3.4, -3.2, 0])(
         solid.rotate([0, 0, -30])(
-            solid.scale([22, 6.5, 0.5])(
+            solid.scale([22, 6.5, 0.3])(
                 solid.cube(1)
             )
         )
