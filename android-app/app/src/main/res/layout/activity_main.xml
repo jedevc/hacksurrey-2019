@@ -18,12 +18,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="150dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_gravity="center"
             android:gravity="center">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/upload_button"
-                android:layout_width="120dp"
+                android:layout_width="140dp"
                 android:layout_height="80dp"
                 android:text="Upload File"
                 android:textColor="@color/colorText"
@@ -32,19 +32,16 @@
                 app:icon="@drawable/upload_white"
                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:onClick="uploadButtonOnClick"
-                android:padding="8dp"/>
+                android:padding="16dp"/>
+
+            <TextView
+                android:id="@+id/output_box"
+                android:padding="8dp"
+                android:layout_marginTop="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"/>
+
         </LinearLayout>
-
     </LinearLayout>
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        app:layout_anchor="@id/linear_layout"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/done_white" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

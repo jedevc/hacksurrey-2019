@@ -3,7 +3,6 @@ package com.will_russell.hacksurrey;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
-import android.icu.util.Output;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -11,6 +10,7 @@ import android.view.View;
 import android.content.Intent;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     static final int GET_FROM_STORAGE = 1;
     static final String SERVER_URL = "https://38d2ee85.ngrok.io";
     ArrayList<Uri> files = new ArrayList<>();
-
+    String postResponse = "";
     KSIServiceCredentials credentials;
     HttpClientSettings clientSettings;
     SimpleHttpClient simpleHttpClient;
@@ -52,12 +52,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*
-        try {
-            setupGuardtime();
-        } catch (KSIException e) {
-            e.printStackTrace();
-        } */
     }
 
     public void setupGuardtime() throws KSIException {
@@ -108,14 +102,16 @@ public class MainActivity extends AppCompatActivity {
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String line;
-                String response = "";
+                postResponse = "";
                 BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 while ((line = br.readLine()) != null) {
-                    response += line;
+                    postResponse += line;
                 }
-                System.out.println(response);
+                System.out.println(responseCode);
+                System.out.println(postResponse);
+                TextView tv = (TextView) findViewById(R.id.output_box);
+                tv.setText(postResponse);
             }
-
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (SocketTimeoutException e) {
