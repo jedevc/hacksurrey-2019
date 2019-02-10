@@ -15,23 +15,11 @@ import android.widget.TextView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.guardtime.ksi.KSI;
-import com.guardtime.ksi.KSIBuilder;
-import com.guardtime.ksi.exceptions.KSIException;
-import com.guardtime.ksi.hashing.DataHasher;
-import com.guardtime.ksi.hashing.HashAlgorithm;
-import com.guardtime.ksi.service.client.KSIServiceCredentials;
-import com.guardtime.ksi.service.client.http.HttpClientSettings;
-import com.guardtime.ksi.service.http.simple.SimpleHttpClient;
-import com.guardtime.ksi.trust.X509CertificateSubjectRdnSelector;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -42,11 +30,6 @@ public class MainActivity extends AppCompatActivity {
     static final String SERVER_URL = "https://38d2ee85.ngrok.io";
     ArrayList<Uri> files = new ArrayList<>();
     String postResponse = "";
-    KSIServiceCredentials credentials;
-    HttpClientSettings clientSettings;
-    SimpleHttpClient simpleHttpClient;
-    KSI ksi;
-    DataHasher hasher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -54,32 +37,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void setupGuardtime() throws KSIException {
-        credentials = new KSIServiceCredentials("ot.9HL3ao", "F8ByaJsVcq0c");
-
-        clientSettings = new HttpClientSettings(
-                "http://tryout.guardtime.net:8080/gt-signingservice",
-                "https://tryout-extender.guardtime.net:8081/gt-extendingservice",
-                "http://verify.guardtime.com/ksi-publications.bin",
-                credentials);
-
-        simpleHttpClient = new SimpleHttpClient(clientSettings);
-        KeyStore ks;
-        try {
-            ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            ksi = new KSIBuilder()
-                    .setKsiProtocolSignerClient(simpleHttpClient)
-                    .setKsiProtocolExtenderClient(simpleHttpClient)
-                    .setKsiProtocolPublicationsFileClient(simpleHttpClient)
-                    .setPublicationsFileTrustedCertSelector(new X509CertificateSubjectRdnSelector("E=publications@guardtime.com"))
-                    .setPublicationsFilePkiTrustStore(ks)
-                    .build();
-            System.out.println("Hash algorithm: " + HashAlgorithm.SHA2_256);
-            DataHasher hasher = new DataHasher();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void makeRequest(byte[] data) {
         HttpURLConnection client = null;
