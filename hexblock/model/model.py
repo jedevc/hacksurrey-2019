@@ -9,7 +9,7 @@ from . import permute
 def main():
     stuff = bytes(random.randint(0, 255) for i in range(32))
     m = create_model(stuff, 3, 9)
-    print(scad_render(m))
+    print(render_model(m))
 
 def create_model(data, rows, columns):
     hexes = to_base(int.from_bytes(data, 'big'), 720)
@@ -32,6 +32,9 @@ def create_model(data, rows, columns):
             sts.append(st)
 
     return union()(sts)
+
+def render_model(model):
+    return scad_render(model)
 
 def to_base(number, base):
     top = 1

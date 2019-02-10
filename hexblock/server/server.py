@@ -6,9 +6,12 @@ from os import path
 import hashlib
 import re
 
+from ..model import model
+
 app = Flask(__name__)
 
 UPLOADS = './uploads'
+MODELS = './models'
 
 @app.route('/')
 def hello():
@@ -44,10 +47,35 @@ def get_file(hid):
 
     filename = path.join(UPLOADS, hid)
     try:
-        with open(filename) as f:
+        with open(filename, 'rb') as f:
             return f.read()
     except FileNotFoundError:
         return 'no file with that hash exists', 404
+
+@app.route('/model/<hid>')
+def get_model(hid):
+    if re.search('[^0-9a-f]', hid):
+        return 'invalid hash provided'
+
+    model_filename = path.join(MODELS, hid)
+    try:
+        with open(model_filename, 'rb') as mf:
+            return mf.read()
+    except FileNotFoundError:
+        pass
+
+    try:
+        upload_filename = path.join(UPLOADS, hid)
+
+        if path.exists(upload_filename):
+            mod = model.create_model(bytes.fromhex(hid), 3, 9)
+            mod = model.render_model(mod).encode('utf8')
+            model_filename = path.join(MODELS, hid)
+            with open(model_filename, 'wb') as mf:
+                mf.write(mod)
+            return mod
+    except FileNotFoundError:
+        pass
 
 @app.errorhandler(404)
 def not_found(error):
@@ -55,5 +83,6 @@ def not_found(error):
 
 def main():
     os.makedirs(UPLOADS, exist_ok=True)
+    os.makedirs(MODELS, exist_ok=True)
 
     app.run()
