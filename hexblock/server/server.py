@@ -7,6 +7,8 @@ import subprocess
 import hashlib
 import re
 
+from threading import Thread
+
 from ..model import model
 
 app = Flask(__name__)
@@ -74,7 +76,8 @@ def main():
     app.run()
 
 def get_model(hid):
-    model_filename = path.join(MODELS, hid)
+    model_filename = path.join(MODELS, hid + '.scad')
+    print(model_filename)
     if path.exists(model_filename):
         return model_filename
     else:
@@ -83,7 +86,6 @@ def get_model(hid):
         if path.exists(upload_filename):
             mod = model.create_model(bytes.fromhex(hid), 3, 9)
             mod = model.render_model(mod).encode('utf8')
-            model_filename = path.join(MODELS, hid)
             with open(model_filename, 'wb') as mf:
                 mf.write(mod)
             return model_filename
@@ -91,12 +93,17 @@ def get_model(hid):
     return None
 
 def get_render(hid):
-    if not get_model(hid):
+    model_filename = get_model(hid)
+    if model_filename is None:
         return None
 
     render_filename = path.join(MODELS, hid + '.stl')
     if not path.exists(render_filename):
-        model_filename = path.join(MODELS, hid)
         subprocess.run(['openscad', model_filename, '-o', render_filename])
+
+        print(['openscad', model_filename])
+        func = lambda: subprocess.run(['openscad', model_filename])
+        thread = Thread(target=func)
+        thread.start()
 
     return render_filename
