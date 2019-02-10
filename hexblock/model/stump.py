@@ -60,32 +60,38 @@ def stump(heights):
     y = unit * (3 ** 0.5 / 2) / 2
 
     return union()(
-        scale([1, 1, heights[0]])(
-            tri
-        ),
+        # top left
         scale([1, 1, heights[1]])(
             translate([0, 2 * y, 0])(
                 rtri
             )
         ),
+        # top middle
         scale([1, 1, heights[2]])(
             translate([x, 2 * y, 0])(
                 tri
             )
         ),
+        # top right
         scale([1, 1, heights[3]])(
             translate([2 * x, 2 * y, 0])(
                 rtri
             )
         ),
+        # bottom right
         scale([1, 1, heights[4]])(
             translate([2 * x, 0, 0])(
                 tri
             )
         ),
+        # bottom middle
         scale([1, 1, heights[5]])(
             translate([x, 0, 0])(
                 rtri
             )
+        ),
+        # bottom left
+        scale([1, 1, heights[0]])(
+            tri
         )
     )
