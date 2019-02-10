@@ -14,10 +14,6 @@ app = Flask(__name__)
 UPLOADS = './uploads'
 MODELS = './models'
 
-@app.route('/')
-def hello():
-    return 'Hello World!'
-
 @app.route('/create', methods=['POST'])
 def create():
     data = None
