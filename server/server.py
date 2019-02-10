@@ -8,7 +8,7 @@ import re
 
 app = Flask(__name__)
 
-UPLOADS = '/tmp/uploads'
+UPLOADS = './uploads'
 
 @app.route('/')
 def hello():
