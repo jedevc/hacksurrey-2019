@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.icu.util.Output;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.content.Intent;
 import android.Manifest;
@@ -33,10 +34,12 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class MainActivity extends AppCompatActivity {
 
     static final int GET_FROM_STORAGE = 1;
-    static final String SERVER_URL = "";
+    static final String SERVER_URL = "https://38d2ee85.ngrok.io";
     ArrayList<Uri> files = new ArrayList<>();
 
     KSIServiceCredentials credentials;
@@ -54,8 +57,7 @@ public class MainActivity extends AppCompatActivity {
             setupGuardtime();
         } catch (KSIException e) {
             e.printStackTrace();
-        }
-        */
+        } */
     }
 
     public void setupGuardtime() throws KSIException {
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     .setPublicationsFilePkiTrustStore(ks)
                     .build();
             System.out.println("Hash algorithm: " + HashAlgorithm.SHA2_256);
-            DataHasher hasher = new DataHasher(HashAlgorithm.SHA2_256);
+            DataHasher hasher = new DataHasher();
         } catch (KeyStoreException e) {
             e.printStackTrace();
         }
@@ -88,15 +90,32 @@ public class MainActivity extends AppCompatActivity {
     public void makeRequest(byte[] data) {
         HttpURLConnection client = null;
         try {
-            URL url = new URL(SERVER_URL);
+            URL url = new URL(SERVER_URL + "/create");
             client = (HttpURLConnection) url.openConnection();
             client.setRequestMethod("POST");
-            client.setRequestProperty("Key", "Value");
             client.setDoOutput(true);
-            OutputStream outputStream  = client.getOutputStream());
+            client.setUseCaches(false);
+            OutputStream outputStream  = client.getOutputStream();
+            String file_start = "file=";
+            byte[] bytes;
+            bytes = file_start.getBytes();
+            outputStream.write(bytes);
             outputStream.write(data);
             outputStream.flush();
             outputStream.close();
+
+            int responseCode = client.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                String line;
+                String response = "";
+                BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                while ((line = br.readLine()) != null) {
+                    response += line;
+                }
+                System.out.println(response);
+            }
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (SocketTimeoutException e) {
@@ -134,26 +153,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GET_FROM_STORAGE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == GET_FROM_STORAGE && resultCode == Activity.RESULT_OK && data != null) {
             Uri fileUri = data.getData();
             files.add(fileUri);
 
             // Read the input file to be signed
-            byte[] fileContent;
-            try {
+            int SDK_INT = android.os.Build.VERSION.SDK_INT;
+            if (SDK_INT > 8) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                        .permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                byte[] fileContent;
+                try {
 
-                InputStream stream = getContentResolver().openInputStream(fileUri);
-                fileContent = getBytes(stream);
-                makeRequest();
-                //System.out.printf("\n\nInput file: %s\n", new String(fileContent));
-                //hasher.addData(stream);
-            } catch (IOException e) {
-                e.printStackTrace();
+                    InputStream stream = getContentResolver().openInputStream(fileUri);
+                    fileContent = getByte(stream);
+                    System.out.printf("\n\nInput file: %s\n", new String(fileContent));
+                    makeRequest(fileContent);
+                    //hasher.addData(stream);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    private byte[] getBytes(InputStream inputStream) throws IOException {
+    private byte[] getByte(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int length = 0;
