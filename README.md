@@ -9,6 +9,8 @@ dedided to build an app that allows you to verify that you created a file,
 whether that be a PDF, image or anything by creating a corresponding physical
 object to represent.
 
+![Print of a SHA-256 hash](https://raw.githubusercontent.com/wrussell1999/hacksurrey-2019/master/print.jpg)
+
 ## The process
 
 - Our app takes a file and uploads it to the server
