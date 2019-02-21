@@ -70,3 +70,6 @@ $ cd hacksurrey-2019.git
 $ pip install -r requirements.txt
 $ python -m hexblock.server
 ```
+## License
+
+All the code in this repository is licensed under the AGPL.
