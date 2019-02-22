@@ -74,7 +74,7 @@ def render_model(model):
 
 def to_base(number, base):
     top = 1
-    while base ** top < number:
+    while base ** top <= number:
         top += 1
 
     parts = []
@@ -84,3 +84,13 @@ def to_base(number, base):
         number %= value
 
     return parts
+
+def from_base(parts, base):
+    number = 0
+
+    place = 1
+    for value in reversed(parts):
+        number += value * place
+        place *= base
+
+    return number
