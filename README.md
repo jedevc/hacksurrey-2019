@@ -45,6 +45,12 @@ Yes, this is inpractical. Yes, it would take far too long to do. We know.
 
 But it looks pretty :)
 
+## App
+
+We tried to get the app to use the Guardtime KSI SDK to hash the data uploaded. The hash would then be sent to the server to be processed. Due to the type of Bouncy Castle Android uses, the SDK wouldn't work properly. We changed it so the app turns the file into bytes and sends the server the file in raw bytes, to be hashed there.
+
+![Hexblock Android app](android-app.png)
+
 ## Team
 
 Our team was 2 people:
@@ -54,7 +60,7 @@ Our team was 2 people:
 
 ## Tools
 
-- Android studio (for our app)
+- Android Studio (for our app)
 - Flask (for our web server)
 - SolidPython (for generating models)
 - OpenSCAT (for rendering models)
