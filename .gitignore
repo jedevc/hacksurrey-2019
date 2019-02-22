@@ -200,3 +200,6 @@ dmypy.json
 # Project stuff
 uploads/
 models/
+
+# Writeup stuff
+svg-inkscape
