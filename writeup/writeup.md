@@ -37,7 +37,7 @@ wear-and-tear could cause the heights to not represent the value they were
 originally meant to.
 
 Therefore, we chose to encode data, not as a function of the height of a single
-triangle, but as a function of the collection of heights of the six triangles
+triangle, but as a function of the order of heights of the six triangles
 arranged into a hexagon.
 
 ## Permutation
