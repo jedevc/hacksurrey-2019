@@ -9,7 +9,7 @@ dedided to build an app that allows you to verify that you created a file,
 whether that be a PDF, image or anything by creating a corresponding physical
 object to represent.
 
-![Print of a SHA-256 hash](https://raw.githubusercontent.com/wrussell1999/hacksurrey-2019/master/print.jpg)
+![Print of a SHA-256 hash](https://raw.githubusercontent.com/jedevc/hacksurrey-2019/master/print.jpg)
 
 ## The process
 
@@ -71,7 +71,7 @@ Our team was 2 people:
 Simple to run:
 
 ```bash
-$ git clone https://github.com/wrussell1999/hacksurrey-2019.git
+$ git clone https://github.com/jedevc/hacksurrey-2019.git
 $ cd hacksurrey-2019.git
 $ pip install -r requirements.txt
 $ python -m hexblock.server
