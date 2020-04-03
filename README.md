@@ -63,7 +63,7 @@ Our team was 2 people:
 - Android Studio (for our app)
 - Flask (for our web server)
 - SolidPython (for generating models)
-- OpenSCAT (for rendering models)
+- OpenSCAD (for rendering models)
 - CURA (for processing our final model)
 
 ## Running
